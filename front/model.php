@@ -32,32 +32,9 @@ include ('../../../inc/includes.php');
 $PluginPduModel = new PluginPduModel();
 $PluginPduModel->checkGlobal("r");
 
-if (!isset($_SESSION['glpi_plugin_pdu_tab'])) $_SESSION['glpi_plugin_pdu_tab']='ComputerModel';
-if (isset($_GET['onglet'])) {
-  $_SESSION['glpi_plugin_pdu_tab']=$_GET['onglet'];
-}
-	
-Html::header(PluginRacksRack::getTypeName(2), '', "plugins", "pdu");
+Html::header(PluginPduModel::getTypeName(2), '', "plugins", "pdu");
 
-$tabs['ComputerModel']=array('title'=>__('Servers', 'racks'),
-'url'=>$CFG_GLPI['root_doc']."/plugins/pdu/ajax/model.tabs.php",
-'params'=>"target=".$_SERVER['PHP_SELF']."&id=-1&plugin_pdu_tab=".'ComputerModel');
-  
-$tabs['NetworkEquipmentModel']=array('title'=>_n('Network equipment' , 'Network equipments', 2, 'pdu'),
-'url'=>$CFG_GLPI['root_doc']."/plugins/pdu/ajax/model.tabs.php",
-'params'=>"target=".$_SERVER['PHP_SELF']."&id=-1&plugin_pdu_tab=".'NetworkEquipmentModel');
-
-$tabs['PeripheralModel']=array('title'=>_n('Peripheral' , 'Peripherals', 2, 'pdu'),
-'url'=>$CFG_GLPI['root_doc']."/plugins/pdu/ajax/model.tabs.php",
-'params'=>"target=".$_SERVER['PHP_SELF']."&id=-1&plugin_pdu_tab=".'PeripheralModel');
-
-$tabs['all']=array('title'=>__('All'),
-'url'=>$CFG_GLPI['root_doc']."/plugins/pdu/ajax/model.tabs.php",
-'params'=>"target=".$_SERVER['PHP_SELF']."&id=-1&plugin_pdu_tab=all");
-        
-echo "<div id='tabspanel' class='center-h'></div>";
-Ajax::createTabs('tabspanel','tabcontent',$tabs,'PluginPduModel');
-$PluginPduModel->addDivForTabs();
+$PluginPduModel->showList();
 
 Html::footer();
 

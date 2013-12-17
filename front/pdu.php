@@ -32,55 +32,12 @@ include ('../../../inc/includes.php');
 Html::header(PluginPduPdu::getTypeName(2),'',"plugins","pdu");
 
 $PluginPduPdu=new PluginPduPdu();
-if (!$PluginPduPdu->canView() || !Session::haveRight("config","w")) {
+if ($PluginPduPdu->canView() || Session::haveRight("config","w")) {
+   $_SESSION["glpisearchcount2"]["PluginPduModel"] = 0;
+   Search::show("PluginPduModel");
+} else {
    Html::displayRightError();
 }
-
-$tr_class_num = 2;
-echo '<div class="center">';
-echo "<table class='tab_cadrehov'>";
-echo "<tr>";
-echo "<th>" . __('Name') . "</th>";
-echo "<th>" . __('Type') . "</th>";
-echo "<th>" . __('Model') . "</th>";
-echo "<th>" . __('Outlets used') . "</th>";
-echo "<th>" . __('Outlets total') . "</th>";
-echo "</tr>";
-
-$class_table = getTableForItemType('PluginPduModel');
-
-foreach (PluginPduPdu::$types as $type) {
-   $type_table = getTableForItemType($type);
-   $model_table = getTableForItemType($type."Model");
-   $type_field = getForeignKeyFieldForTable($type_table);
-   $model_field = getForeignKeyFieldForTable($model_table);
-
-   $query = "SELECT ".$type_table.".* 
-      FROM `".$type_table."`
-      JOIN `".$model_table."`
-         ON `".$type_table."`.`".$model_field."`=`".$model_table."`.`id`
-      JOIN `".$class_table."`
-         ON `".$model_table."`.`id`=`".$class_table."`.`model_id`
-            AND `".$class_table."`.`itemtype`='".$type."Model';";
-
-   $result = $DB->query($query);
-   $number = $DB->numrows($result);
-
-   if ($number = 0)
-      continue;
-
-   while ($data = $DB->fetch_assoc($result)) {
-      echo "<tr>";
-      echo '<td valign="top">';
-      echo '<a id="'.$type.'_'.$data['id'].'">'.$data['name'].'</a>';
-      echo "</td>";
-      echo "</tr>";
-   }
-}
-
-echo "</table>";
-echo '</div>';
-
 
 Html::footer();
 

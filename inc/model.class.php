@@ -5,23 +5,29 @@ if (!defined('GLPI_ROOT')) {
 }
 
 class PluginPduModel extends CommonDBTM {
+
    static $itemmodel = 'NetworkEquipmentModel';
+
 
    static function getTypeName($nb = 0) {
       return __('PDU models specifications', 'pdu');
    }
 
+
    static function canCreate() {
       return true;
    }
+
 
    static function canView() {
       return true;
    }
 
+
    function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
       return __('PDU details', 'pdu');
    }
+
 
    static function displayTabContentForItem (CommonGLPI $item, $tabnum=1, $withtemplate=0) {
       global $CFG_GLPI;
@@ -30,6 +36,7 @@ class PluginPduModel extends CommonDBTM {
       $self->showForm("", array( 'items_id' => $item->getField('id') ,
                                  'target'   => $CFG_GLPI['root_doc']."/plugins/pdu/front/model.form.php"));
    }
+
 
    function showForm ($ID, $options=array()) {
 
@@ -66,6 +73,7 @@ class PluginPduModel extends CommonDBTM {
       $this->showFormButtons($options);
    }
 
+
    function UpdateModel($input) {
       global $DB;
 
@@ -76,26 +84,32 @@ class PluginPduModel extends CommonDBTM {
       $this->update($input);
    }
 
+
    static function getModelClasses () {
       static $types = array( 'ComputerModel','NetworkEquipmentModel','PeripheralModel','PluginRacksOtherModel' );
       return $types;
    }
 
-   function showList($target,$id,$itemtype,$withtemplate='') {
+
+   function showList($withtemplate='') {
 
       $rand=mt_rand();
-      echo "<div align='center'>";
-      echo "<form method='post' name='massiveaction_form$rand' id='massiveaction_form$rand'  action=\"$target\">";
+      Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
+      Html::showMassiveActions(__CLASS__);
 
-      $this->showModels($itemtype,$id,$rand);
+      $this->showModels($rand);
+
+      $massiveactionparams['ontop'] = false;
+      Html::showMassiveActions(__CLASS__, $massiveactionparams);
+      Html::closeForm();
    }
 
-   function showModels($itemtype,$id,$rand) {
+
+   function showModels() {
       global $DB;
 
-      $link = Toolbox::getItemTypeFormURL($itemtype);
-      $table = getTableForItemType($itemtype);
-      $search = Toolbox::getItemTypeSearchURL($itemtype);
+      $link  = Toolbox::getItemTypeFormURL(PluginPduModel::$itemmodel);
+      $table = getTableForItemType(PluginPduModel::$itemmodel);
 
       echo "<table class='tab_cadre_fixe' cellpadding='5'>";
       echo "<tr class='tab_bg_1'>";
@@ -106,7 +120,7 @@ class PluginPduModel extends CommonDBTM {
 
       $modelid=-1;
 
-      $result = $DB->query("SELECT * FROM `".$this->getTable()."` ".($itemtype != -1 ? "WHERE `itemtype` = '$itemtype'" : "")." ");
+      $result = $DB->query("SELECT * FROM `".$this->getTable()."`");
       while ($data = $DB->fetch_assoc($result)) {
          $modelid = $data['model_id'];
          $id = $data['id'];
@@ -121,12 +135,11 @@ class PluginPduModel extends CommonDBTM {
          echo Dropdown::getDropdownName($table,$modelid);
          echo "</a></td>";
          echo "<td>" . $data['outlets_qty'] . "</td>";
-
-
+         echo "</tr>";
       }
-
+      echo "</table>";
+      
    }
-
 }
 
 ?>

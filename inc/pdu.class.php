@@ -40,11 +40,6 @@ class PluginPduPdu extends CommonDBTM {
       print '</tr>';
       print '</table>';
    }
-
-   function getSearchOptions() {
-      
-   }
-
 }
 
 ?>

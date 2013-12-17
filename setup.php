@@ -13,13 +13,7 @@ function plugin_init_pdu() {
    );
 
    $PLUGIN_HOOKS['item_purge']['pdu'] = array( 'NetworkEquipment' => 'plugin_item_purge_pdu' );
-   $PLUGIN_HOOKS['submenu_entry']['pdu']['search'] = 'front/pdu.php';
-
-   $PLUGIN_HOOKS['menu_entry']['pdu'] = 'front/pdu.php';
-   $PLUGIN_HOOKS['submenu_entry']['pdu']["<img  src='".
-      $CFG_GLPI["root_doc"]."/pics/menu_showall.png' title=\"".__('PDU models', 'racks').
-      "\" alt=\"".__('pdu', 'pdu')."\">"] = 'front/model.php';
-
+   $PLUGIN_HOOKS['menu_entry']['pdu'] = 'front/model.php';
 
    // Massive Action definition
    $PLUGIN_HOOKS['use_massive_action']['pdu'] = 1;
