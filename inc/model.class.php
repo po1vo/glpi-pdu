@@ -67,7 +67,7 @@ class PluginPduModel extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td>" . __('Number of outlets') . "</td>";
       echo "<td>";
-      Dropdown::showInteger("outlets_qty", ($ID > 0) ? $this->fields["outlets_qty"] : 1, 1, 50, 1);
+      Dropdown::showInteger("outlets", ($ID > 0) ? $this->fields["outlets"] : 1, 1, 50, 1);
       echo "</td>";
       echo "</tr>";
       $this->showFormButtons($options);
@@ -108,8 +108,8 @@ class PluginPduModel extends CommonDBTM {
    function showModels() {
       global $DB;
 
-      $link  = Toolbox::getItemTypeFormURL(PluginPduModel::$itemmodel);
-      $table = getTableForItemType(PluginPduModel::$itemmodel);
+      $link  = Toolbox::getItemTypeFormURL(self::$itemmodel);
+      $table = getTableForItemType(self::$itemmodel);
 
       echo "<table class='tab_cadre_fixe' cellpadding='5'>";
       echo "<tr class='tab_bg_1'>";
@@ -134,11 +134,21 @@ class PluginPduModel extends CommonDBTM {
          echo "<a href=\"".$link."?id=".$modelid."\">";
          echo Dropdown::getDropdownName($table,$modelid);
          echo "</a></td>";
-         echo "<td>" . $data['outlets_qty'] . "</td>";
+         echo "<td>" . $data['outlets'] . "</td>";
          echo "</tr>";
       }
       echo "</table>";
-      
+   }
+
+
+   function getModelFromPduId($ID) {
+      $this->getFromDBByQuery(
+         "LEFT JOIN `glpi_networkequipmentmodels` 
+            ON `glpi_networkequipmentmodels`.`id`=`glpi_plugin_pdu_models`.`model_id`  
+         LEFT JOIN `glpi_networkequipments` 
+            ON `glpi_networkequipments`.`networkequipmentmodels_id`=`glpi_networkequipmentmodels`.`id` 
+         WHERE `glpi_networkequipmentmodels`.`id`=`".$ID."`"
+      );
    }
 }
 

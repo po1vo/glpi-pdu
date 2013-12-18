@@ -19,27 +19,44 @@ class PluginPduPdu extends CommonDBTM {
       return true;
    }
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
-      return __('PDUs', 'pdu');
+   function listAvailablePdus() {
+      
    }
 
-   static function displayTabContentForItem (CommonGLPI $item, $tabnum=1, $withtemplate=0) {
-      print '<table class="tab_cadre_fixe">';
-      print '<tr class="tab_bg_2">';
-      print '<th colspan=2>Connect to a PDU</th>';
-      print '</tr>';
-      print '</table>';
+   static function getAvailPdus($name) {
+      global $DB;
 
-      print '<table class="tab_cadre_fixe">';
-      print '<tr class="tab_bg_2">';
-      print '<th>&nbsp;</th>';
-      print '<th>' . __('PDU Name', 'pdu')  .  '</th>';
-      print '<th>' . __('PDU Type', 'pdu')  .  '</th>';
-      print '<th>' . __('Location', 'pdu')  .  '</th>';
-      print '<th>' . __('Outlet', 'pdu')  .  '</th>';
-      print '</tr>';
-      print '</table>';
-   }
+      $ret = array();
+
+      $query = "
+         SELECT
+            `glpi_networkequipments`.`id`,
+            `glpi_networkequipments`.`name`,
+            `glpi_plugin_pdu_models`.`model_id`,
+            `glpi_plugin_pdu_models`.`outlets`,
+            `conn`.`used`
+         FROM `glpi_networkequipments`
+         JOIN `glpi_networkequipmentmodels`
+            ON `glpi_networkequipments`.`networkequipmentmodels_id`=`glpi_networkequipmentmodels`.`id`
+         JOIN `glpi_plugin_pdu_models`
+            ON `glpi_networkequipmentmodels`.`id`=`glpi_plugin_pdu_models`.`model_id`
+         LEFT JOIN
+            (SELECT `pdu_id`, COUNT(*) AS `used` FROM `glpi_plugin_pdu_connections`) AS `conn`
+            ON `glpi_networkequipments`.`id`=`conn`.`pdu_id`
+         WHERE IFNULL(`conn`.`used`,0) < `glpi_plugin_pdu_models`.`outlets` ";
+
+      if ($name)
+         $query .= " AND `glpi_networkequipments`.`name` LIKE '%".$name."%'";
+     
+      $query .= " ORDER BY `glpi_networkequipments`.`name`";
+
+      $result = $DB->query($query);
+      while ($data = $DB->fetch_assoc($result)) {
+         $ret[$data['id']] = $data;
+      }
+
+      return $ret;
+   } 
 }
 
 ?>

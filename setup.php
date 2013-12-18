@@ -4,7 +4,7 @@
 function plugin_init_pdu() {
    global $PLUGIN_HOOKS,$CFG_GLPI;
 
-   Plugin::registerClass('PluginPduPdu', 
+   Plugin::registerClass('PluginPduConnection', 
        array( "addtabon" => "NetworkEquipment" )
    );
 
