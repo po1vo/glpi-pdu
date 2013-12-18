@@ -19,10 +19,6 @@ class PluginPduPdu extends CommonDBTM {
       return true;
    }
 
-   function listAvailablePdus() {
-      
-   }
-
    static function getAvailPdus($name) {
       global $DB;
 

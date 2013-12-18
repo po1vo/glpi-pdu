@@ -6,7 +6,8 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginPduModel extends CommonDBTM {
 
-   static $itemmodel = 'NetworkEquipmentModel';
+   const ITEM_TYPE   = 'NetworkEquipment';
+   const ITEM_MODEL  = 'NetworkEquipmentModel';
 
 
    static function getTypeName($nb = 0) {
@@ -85,12 +86,6 @@ class PluginPduModel extends CommonDBTM {
    }
 
 
-   static function getModelClasses () {
-      static $types = array( 'ComputerModel','NetworkEquipmentModel','PeripheralModel','PluginRacksOtherModel' );
-      return $types;
-   }
-
-
    function showList($withtemplate='') {
 
       $rand=mt_rand();
@@ -105,8 +100,8 @@ class PluginPduModel extends CommonDBTM {
    function showModels() {
       global $DB;
 
-      $link  = Toolbox::getItemTypeFormURL(self::$itemmodel);
-      $table = getTableForItemType(self::$itemmodel);
+      $link  = Toolbox::getItemTypeFormURL(self::ITEM_MODEL);
+      $table = getTableForItemType(self::ITEM_MODEL);
 
       echo "<table class='tab_cadre_fixe' cellpadding='5'>";
       echo "<tr class='tab_bg_1'>";
@@ -138,14 +133,15 @@ class PluginPduModel extends CommonDBTM {
    }
 
 
-   function getModelFromPduId($ID) {
-      $this->getFromDBByQuery(
-         "LEFT JOIN `glpi_networkequipmentmodels` 
-            ON `glpi_networkequipmentmodels`.`id`=`glpi_plugin_pdu_models`.`model_id`  
-         LEFT JOIN `glpi_networkequipments` 
-            ON `glpi_networkequipments`.`networkequipmentmodels_id`=`glpi_networkequipmentmodels`.`id` 
-         WHERE `glpi_networkequipmentmodels`.`id`=`".$ID."`"
-      );
+   function isPdu(CommonGLPI $item) {
+      if ($item->getType() != self::ITEM_TYPE)
+         return false;
+
+      $modelfield = getForeignKeyFieldForTable(getTableForItemType(self::ITEM_MODEL));
+      $model_id = $item->fields[$modelfield];
+
+      return $this->getFromDBByQuery(
+         "WHERE `" . $this->getTable() . "`.`model_id` = '" . Toolbox::cleanInteger($model_id) . "' LIMIT 1");
    }
 }
 
