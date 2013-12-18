@@ -44,7 +44,7 @@ $PluginPduModel->getFromDBByQuery("WHERE `" . $PluginPduModel->getTable() . "`.`
 
 Dropdown::showFromArray(
    'outlet_id',
-   range(1, $PluginPduModel->fields["outlets"]),
+   array_combine( range(1, $PluginPduModel->fields["outlets"]), range(1, $PluginPduModel->fields["outlets"]) ),
    array(
       'rand' => $_POST["rand"],
       'used' => $used_outlets,

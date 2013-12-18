@@ -94,9 +94,6 @@ class PluginPduModel extends CommonDBTM {
    function showList($withtemplate='') {
 
       $rand=mt_rand();
-      Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
-      Html::showMassiveActions(__CLASS__);
-
       $this->showModels($rand);
 
       $massiveactionparams['ontop'] = false;

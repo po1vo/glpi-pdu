@@ -23,12 +23,12 @@ class PluginPduConnection extends CommonDBTM {
    }
 
    static function displayTabContentForItem (CommonGLPI $item, $tabnum=1, $withtemplate=0) {
-      global $CFG_GLPI;
+      global $CFG_GLPI, $DB;
 
       $self=new self();
       $rand = mt_rand();
 
-      echo "<form method='get' action='" . $self->getFormURL() ."'>";
+      echo "<form id='add_connection_form' name='add_connection_form' method='POST' action='" . $self->getFormURL() ."'>";
       echo "<input type='hidden' name='connected_id' value='".$item->getID()."'>";
       echo "<input type='hidden' name='connected_itemtype' value='".$item->getType()."'>";
       echo '<div class="firstbloc">';
@@ -39,13 +39,16 @@ class PluginPduConnection extends CommonDBTM {
       echo "&nbsp;";
 
       $params = array( 'searchText' => '__VALUE__',
-                       'rand'       => $rand, 
-                );
+                       'rand'       => $rand, );
 
-      $default = Dropdown::showFromArray("pdu_id", array('0' => Dropdown::EMPTY_VALUE, '1' => '1'), array('rand' => $rand, 'display' => false) );
-
+      $default = Dropdown::showFromArray(
+         "pdu_id", 
+         array( '0' => Dropdown::EMPTY_VALUE ), 
+         array( 
+            'rand' => $rand, 
+            'display' => false) 
+      );
       Ajax::dropdown($CFG_GLPI["use_ajax"], "/plugins/pdu/ajax/dropdownPdus.php", $params, $default, $rand );
-      Ajax::updateItemOnSelectEvent("dropdown_pdu_id".$rand, "outlet_id".$rand, "/plugins/pdu/ajax/dropdownOutlets.php", $params);
 
       echo "&nbsp;Outlet&nbsp;";
 
@@ -54,30 +57,64 @@ class PluginPduConnection extends CommonDBTM {
       echo "</span>";
 
       echo    "</td>";
-      echo    "<td><input type='submit' name='create' value=\""._sx('button','Add')."\" class='submit'></td>\n";
+      echo    "<td><input type='submit' name='add' value=\""._sx('button','Add')."\" class='submit'></td>\n";
       echo   '</tr>';
       echo  '</table>';
       echo '</div>';
-
-      print '<table class="tab_cadre_fixe">';
-      print '<tr class="tab_bg_2">';
-      print '<th>&nbsp;</th>';
-      print '<th>' . __('PDU Name', 'pdu')  .  '</th>';
-      print '<th>' . __('Location', 'pdu')  .  '</th>';
-      print '<th>' . __('Outlet', 'pdu')  .  '</th>';
-      print '</tr>';
-      print '</table>';
       Html::closeForm();
+
+
+      $query = "
+         SELECT 
+            `glpi_networkequipments`.`id`,
+            `glpi_networkequipments`.`name`,
+            `glpi_locations`.`completename` AS `location`,
+            `glpi_plugin_pdu_connections`.`outlet_id`,
+            `glpi_plugin_pdu_connections`.`id` AS `connection_id`
+         FROM `glpi_networkequipments`
+            LEFT JOIN `glpi_plugin_pdu_connections`
+               ON `glpi_plugin_pdu_connections`.`pdu_id`=`glpi_networkequipments`.`id`
+            LEFT JOIN `glpi_locations`
+               ON `glpi_locations`.`id`=`glpi_networkequipments`.`locations_id`
+         WHERE
+            `glpi_plugin_pdu_connections`.`connected_id`=".$item->getID()."
+            AND `glpi_plugin_pdu_connections`.`connected_itemtype`='".$item->getType()."'";
+
+      echo "<form id='outlets$rand' name='outlets$rand' method='POST' action='" . $self->getFormURL() ."'>";
+      echo '<div class="firstbloc">';
+      echo '<table class="tab_cadre_fixe">';
+      echo '<tr class="tab_bg_2">';
+      echo '<th width="10"></th>';
+      echo '<th>' . __('PDU Name', 'pdu')  .  '</th>';
+      echo '<th>' . __('Location', 'pdu')  .  '</th>';
+      echo '<th>' . __('Outlet', 'pdu')  .  '</th>';
+      echo '</tr>';
+
+      $result = $DB->query($query);
+      while ($data = $DB->fetch_assoc($result)) {
+         echo "<tr>";
+         echo '<td width="10"><input type="checkbox" name="item['.$data['connection_id'].']" value="1"></td>';
+         echo "<td><a href=\"". Toolbox::getItemTypeFormURL("NetworkEquipment")."?id=".$data['id']."\">".$data['name']."</td>";
+         echo "<td>".$data['location']."</td>";
+         echo "<td>".$data['outlet_id']."</td>";
+         echo "</tr>";
+      }
+
+      Html::openArrowMassives("outlets$rand",true);
+      Html::closeArrowMassives(array('delete' => _sx('button','Disconnect')));
+      Html::closeForm();
+
+      echo '</table>';
+      echo '</div>';
    }
 
    function listUsedOutlets($ID) {
-      $data = $this->find("`pdu_id`=`$ID`");
+      $data = $this->find("`pdu_id`='$ID'");
 
       $outlets = array();
       foreach($data as $key => $assoc) {
-         $outlets[] = $assoc['pdu_outlet'];
+         $outlets[$assoc['outlet_id']] = $assoc['outlet_id'];
       }
-
       return $outlets;
    }
 
