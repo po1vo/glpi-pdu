@@ -124,9 +124,11 @@ class PluginPduModel extends CommonDBTM {
       $rand=mt_rand();
       $this->showModels($rand);
 
+/*
       $massiveactionparams['ontop'] = false;
       Html::showMassiveActions(__CLASS__, $massiveactionparams);
       Html::closeForm();
+*/
    }
 
 
@@ -151,15 +153,15 @@ class PluginPduModel extends CommonDBTM {
          $id = $data['id'];
 
          echo "<tr class='tab_bg_1'>";
-         echo "<td class='center'>";
+         echo "<td class='center' width='10'>";
          echo "<input type='checkbox' name='item[$id]' value='1'>";
          echo "</td>";
 
-         echo "<td>";
+         echo "<td class='center'>";
          echo "<a href=\"".$link."?id=".$modelid."\">";
          echo Dropdown::getDropdownName($table,$modelid);
          echo "</a></td>";
-         echo "<td>" . $data['outlets'] . "</td>";
+         echo "<td class='center'>" . $data['outlets'] . "</td>";
          echo "</tr>";
       }
       echo "</table>";

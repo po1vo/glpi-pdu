@@ -32,7 +32,7 @@ function plugin_version_pdu() {
    return array('name'           => 'PDU',
                 'version'        => '0.0.1',
                 'author'         => 'Vadim Pisarev',
-                'license'        => 'BSD',
+                'license'        => 'GPLv2+',
                 'minGlpiVersion' => '0.84');// For compatibility / no install in version < 0.80
 }
 

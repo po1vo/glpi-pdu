@@ -240,7 +240,7 @@ class PluginPduConnection extends CommonDBTM {
       while ($data = $DB->fetch_assoc($result)) {
          echo "<tr>";
          echo '<td width="10"><input type="checkbox" name="item['.$data['connection_id'].']" value="1"></td>';
-         echo '<td class="center"><a href="'. Toolbox::getItemTypeFormURL(PluginPduModel::ITEM_MODEL)."?id=".$data['id']."\">".$data['name']."</td>";
+         echo '<td class="center"><a href="'. Toolbox::getItemTypeFormURL(PluginPduModel::ITEM_TYPE)."?id=".$data['id']."\">".$data['name']."</td>";
          echo '<td class="center">'.$data['model_name'].'</td>';
          echo '<td class="center">'.$data['location']."</td>";
          echo '<td class="center">'.$data['outlet_id']."</td>";
