@@ -48,14 +48,14 @@ if (isset ($_POST["add"])) {
 } else if (isset ($_POST["delete"])) {
 
    if ($PluginPduModel->canCreate())
-      $PluginPduModel->Delete($_POST);
+      $PluginPduModel->DeleteModel($_POST);
    Html::back();
    
 } else if (isset ($_POST["deleteSpec"])) {
    foreach ($_POST["item"] as $key => $val) {
       $input = array('id' => $key);
       if ($val==1) {
-         $PluginPduModel->delete($input);
+         $PluginPduModel->DeleteModel($input);
       }
    }
    Html::back();

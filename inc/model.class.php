@@ -98,6 +98,27 @@ class PluginPduModel extends CommonDBTM {
    }
 
 
+   function DeleteModel($input) {
+      global $DB;
+
+      $query = "SELECT 1
+         FROM `glpi_plugin_pdu_connections` 
+         LEFT JOIN `glpi_networkequipments` 
+            ON `glpi_networkequipments`.`id`=`glpi_plugin_pdu_connections`.`pdu_id` 
+         LEFT JOIN `glpi_plugin_pdu_models`
+            ON `glpi_networkequipments`.`networkequipmentmodels_id`=`glpi_plugin_pdu_models`.`model_id`
+         WHERE `glpi_plugin_pdu_models`.`id`='".$input['id']."'";
+
+      $result = $DB->query($query);
+
+      if ($DB->numrows($result) > 0) {
+         Session::addMessageAfterRedirect(__('Can\'t delete: there are PDUs in use'), false, ERROR);
+      } else {
+         $this->delete($input);
+      }
+   }   
+
+
    function showList($withtemplate='') {
 
       $rand=mt_rand();
