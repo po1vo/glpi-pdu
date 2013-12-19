@@ -69,9 +69,11 @@ class PluginPduConnection extends CommonDBTM {
          $connected_types[$class_name] = $class_name;
       }
 
-      $params = array( 'idtable' => '__VALUE__',
-                       'rand'    => $rand,
-                       'myname'  => 'connected_id' );
+      $params = array(
+         'idtable' => '__VALUE__',
+         'rand'    => $rand,
+         'myname'  => 'connected_id'
+      );
 
       Dropdown::showFromArray(
          "connected_itemtype", 
@@ -79,10 +81,11 @@ class PluginPduConnection extends CommonDBTM {
          array( 'rand' => $rand )
       );
 
-      Ajax::updateItemOnSelectEvent("dropdown_connected_itemtype$rand", "show_connected_id$rand",
-                                    $CFG_GLPI["root_doc"].
-                                       "/plugins/pdu/ajax/dropdownAllItems.php",
-                                    $params);
+      Ajax::updateItemOnSelectEvent(
+         "dropdown_connected_itemtype$rand", "show_connected_id$rand",
+         $CFG_GLPI["root_doc"]."/plugins/pdu/ajax/dropdownAllItems.php",
+         $params
+      );
 
       echo "<span id='show_connected_id$rand'>&nbsp;</span>\n";
       echo    "</td>";
@@ -237,10 +240,10 @@ class PluginPduConnection extends CommonDBTM {
       while ($data = $DB->fetch_assoc($result)) {
          echo "<tr>";
          echo '<td width="10"><input type="checkbox" name="item['.$data['connection_id'].']" value="1"></td>';
-         echo "<td><a href=\"". Toolbox::getItemTypeFormURL(PluginPduModel::ITEM_MODEL)."?id=".$data['id']."\">".$data['name']."</td>";
-         echo '<td>'.$data['model_name'].'</td>';
-         echo "<td>".$data['location']."</td>";
-         echo "<td>".$data['outlet_id']."</td>";
+         echo '<td class="center"><a href="'. Toolbox::getItemTypeFormURL(PluginPduModel::ITEM_MODEL)."?id=".$data['id']."\">".$data['name']."</td>";
+         echo '<td class="center">'.$data['model_name'].'</td>';
+         echo '<td class="center">'.$data['location']."</td>";
+         echo '<td class="center">'.$data['outlet_id']."</td>";
          echo "</tr>";
       }
 
@@ -267,45 +270,28 @@ class PluginPduConnection extends CommonDBTM {
       return $outlets;
    }
 
-   function showForm ($ID, $options=array()) {
-      $itemtype = -1;
-      if (isset($options['itemtype'])) {
-         $itemtype = $options['itemtype'];
+
+   function prepareInputForAdd($input) {
+      return $this->prepareInput($input);
+   }
+
+
+   function prepareInputForUpdate($input) {
+      return $this->prepareInput($input);
+   }
+
+
+   function prepareInput($input) {
+      global $DB;
+
+      $table_fields = $DB->list_fields($this->getTable());
+
+      foreach($table_fields as $field => $val) {
+         if (empty($input[$field]))
+            return false;
       }
 
-      $items_id = -1;
-      if (isset($options['items_id'])) {
-         $items_id = $options['items_id'];
-      }
-
-      // Existing item?
-      if($this->getFromDBByModel($itemtype,$items_id))
-         $ID = $this->fields["id"];
-
-      if ($ID > 0) {
-         $this->check($ID,'r');
-      } else {
-         // Create item
-         $this->check(-1,'w',$input);
-      }
-
-      $this->showFormHeader($options);
-
-      if ($ID > 0) {
-         echo "<input type='hidden' name='itemtype' value='".$this->fields["itemtype"]."'>";
-         echo "<input type='hidden' name='model_id' value='".$this->fields["model_id"]."'>";
-      } else {
-         echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-         echo "<input type='hidden' name='model_id' value='$items_id'>";
-      }
-
-      echo "<tr class='tab_bg_1'>";
-      echo "<td>" . __('Number of outlets') . "</td>";
-      echo "<td>";
-      Dropdown::showInteger("outlets", ($ID > 0) ? $this->fields["outlets"] : 1, 1, 50, 1);
-      echo "</td>";
-      echo "</tr>";
-      $this->showFormButtons($options);
+      return $input;
    }
 }
 

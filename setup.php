@@ -3,9 +3,10 @@
 // Init the hooks of the plugins -Needed
 function plugin_init_pdu() {
    global $PLUGIN_HOOKS,$CFG_GLPI;
+   static $types = array( 'Computer','NetworkEquipment','Peripheral' );
 
    Plugin::registerClass('PluginPduConnection', 
-       array( "addtabon" => "NetworkEquipment" )
+       array( "addtabon" => $types )
    );
 
    Plugin::registerClass('PluginPduModel',
