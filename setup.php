@@ -13,8 +13,10 @@ function plugin_init_pdu() {
        array( "addtabon" => "NetworkEquipmentModel" )
    );
 
-   $PLUGIN_HOOKS['item_purge']['pdu'] = array( 'NetworkEquipment' => 'plugin_item_purge_pdu' );
    $PLUGIN_HOOKS['menu_entry']['pdu'] = 'front/model.php';
+   foreach ($types as $type) {
+      $PLUGIN_HOOKS['item_purge']['pdu'][$type] = 'plugin_item_purge_pdu';
+   }
 
    // Massive Action definition
    $PLUGIN_HOOKS['use_massive_action']['pdu'] = 1;

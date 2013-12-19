@@ -287,6 +287,9 @@ class PluginPduConnection extends CommonDBTM {
       $table_fields = $DB->list_fields($this->getTable());
 
       foreach($table_fields as $field => $val) {
+         if(array_key_exists('_add', $input) && $field == $this->getIndexName())
+            continue;
+
          if (empty($input[$field]))
             return false;
       }
