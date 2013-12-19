@@ -78,11 +78,23 @@ class PluginPduModel extends CommonDBTM {
    function UpdateModel($input) {
       global $DB;
 
-      $PluginPduModel = new PluginPduModel;
-      $PluginPduModel->getFromDB($input['id']);
+      $query = "SELECT `outlet_id` AS `outlets_max`
+         FROM `glpi_plugin_pdu_connections` 
+         LEFT JOIN `glpi_networkequipments` 
+            ON `glpi_networkequipments`.`id`=`glpi_plugin_pdu_connections`.`pdu_id` 
+         WHERE `glpi_networkequipments`.`networkequipmentmodels_id`='".$input['model_id']."'
+         ORDER BY `outlet_id` 
+         DESC LIMIT 1;";
 
+      $result = $DB->query($query);
+      $data = $DB->fetch_assoc($result);
 
-      $this->update($input);
+      // if new number of outlets is less than the maximum used
+      if ($input['outlets'] < $data['outlets_max']) {
+         Session::addMessageAfterRedirect(__('Can\'t set less outlets than the number in use'), false, ERROR);
+      } else { 
+         $this->update($input);
+      }
    }
 
 
