@@ -32,17 +32,28 @@ function plugin_pdu_uninstall() {
 }
 
 function plugin_item_purge_pdu($item) {
-    global $DB;
+   global $DB;
 
-    $sql = sprintf(
-        'DELETE FROM `glpi_plugin_pdu_connections` ' .
-        'WHERE `connected_itemtype` = \'%s\' ' .
-        'AND `connected_id` = %d',
-        $item->getType(),
-        $item->getID()
-    );
+   $sql = sprintf(
+      'DELETE FROM `glpi_plugin_pdu_connections` ' .
+      'WHERE `connected_itemtype` = \'%s\' ' .
+      'AND `connected_id` = %d',
+      $item->getType(),
+      $item->getID()
+   );
+   $DB->query($sql);
 
-    $DB->query($sql);
+   $PluginPduModel = new PluginPduModel;
+   if ( $PluginPduModel->isPdu($item->getID()) ) {
+      $sql = sprintf(
+         'DELETE FROM `glpi_plugin_pdu_connections`
+          WHERE `pdu_id` = %d',
+         $item->getID()
+      );
+   }
+   $DB->query($sql);
+
+   return true; 
 }
 
 
